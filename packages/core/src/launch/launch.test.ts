@@ -102,6 +102,64 @@ describe("buildPiEnv", () => {
   });
 });
 
+describe("buildPiEnv's isolation", () => {
+  const bird = { brand: BRAND, packageDir: "/b", version: "1.0.0" };
+
+  it("drops every pi variable the person set for pi itself or a parent session", () => {
+    const env = buildPiEnv({
+      bird,
+      birdHome: "/u/.wren",
+      env: {
+        PI_CODING_AGENT_DIR: "/u/.pi/agent",
+        PI_CODING_AGENT_SESSION_DIR: "/shared/sessions",
+        PI_OFFLINE: "1",
+        PI_SKIP_VERSION_CHECK: "0",
+        ANTHROPIC_API_KEY: "kept",
+      },
+    });
+    expect(env["PI_CODING_AGENT_DIR"]).toBe("/u/.wren/agent");
+    expect(env["PI_CODING_AGENT_SESSION_DIR"]).toBeUndefined();
+    expect(env["PI_OFFLINE"]).toBeUndefined();
+    expect(env["PI_SKIP_VERSION_CHECK"]).toBe("1");
+    expect(env["ANTHROPIC_API_KEY"]).toBe("kept");
+  });
+
+  it("gives the bird pi's settings under its own prefix", () => {
+    const env = buildPiEnv({
+      bird,
+      birdHome: "/u/.wren",
+      env: {
+        WREN_OFFLINE: "1",
+        WREN_SKIP_VERSION_CHECK: "0",
+        MAGPIE_TRUE_COLOR: "0",
+      },
+    });
+    expect(env["PI_OFFLINE"]).toBe("1");
+    expect(env["PI_SKIP_VERSION_CHECK"]).toBe("0");
+    expect(env["PI_TRUE_COLOR"]).toBeUndefined();
+  });
+
+  it("never lets a prefixed variable move the bird out of its home", () => {
+    const env = buildPiEnv({
+      bird,
+      birdHome: "/u/.wren",
+      env: { WREN_CODING_AGENT_DIR: "/u/.pi/agent", WREN_HOME: "/elsewhere" },
+    });
+    expect(env["PI_CODING_AGENT_DIR"]).toBe("/u/.wren/agent");
+    expect(env["PI_HOME"]).toBeUndefined();
+  });
+});
+
+describe("resolveBirdHome's independence", () => {
+  it("gives every bird its own home", () => {
+    const homes = ["crow", "magpie", "pigeon"].map((name) => {
+      return resolveBirdHome({ name, env: {}, userHome: "/u" });
+    });
+    expect(new Set(homes).size).toBe(3);
+    expect(homes).not.toContain("/u/.pi");
+  });
+});
+
 describe("resolvePiPackage", () => {
   it("finds the pi this package depends on", () => {
     const pi = resolvePiPackage();

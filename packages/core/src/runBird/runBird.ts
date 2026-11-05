@@ -1,6 +1,7 @@
 import { homedir } from "node:os";
 import { prepareBirdHome } from "../home/home.ts";
 import {
+  buildEnvPrefix,
   buildHomeEnvVarName,
   buildPiArgs,
   buildPiEnv,
@@ -68,8 +69,15 @@ Options:
   --thinking <level>     off, minimal, low, medium, high, xhigh, or max.
 
 Environment:
-  ${buildHomeEnvVarName(name).padEnd(20)} Where ${name} keeps its settings, sessions, and
-                         logins (default: ~/.${name}). Never shared with pi.
+  ${buildHomeEnvVarName(name).padEnd(20)} Where ${name} keeps its settings, sessions, logins,
+                       and skills (default: ~/.${name}).
+  ${`${buildEnvPrefix(name)}<SETTING>`.padEnd(20)} Any pi environment setting, for ${name} only:
+                       ${buildEnvPrefix(name)}OFFLINE=1 is pi's PI_OFFLINE=1. PI_*
+                       variables are ignored.
+
+${displayName} is an independent agent. Its configuration is never shared
+with pi or another bird: change it inside ${name} (/settings, /login) or
+in ~/.${name}/agent.
 
 Examples:
   ${name}                                 Start an interactive session.

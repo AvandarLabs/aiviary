@@ -14,6 +14,14 @@
   exported API in `src/index.ts` is a contract: change it deliberately.
 - `birds/<name>` is one bird. Everything that makes it different lives there:
   `src/brand.ts`, `SYSTEM.md`, `extensions/`, and `skills/` / `prompts/`.
+- **Every bird is an independent agent.** Birds may share packages and
+  libraries, but never configuration: each bird's settings, logins, sessions,
+  MCP servers, instructions, packages, and skills live only in its own home
+  (`~/.<bird>`), and its environment settings only in `<BIRD>_*` variables.
+  Never add a file, directory, or variable that two birds (or a bird and
+  plain pi) read as configuration. Shared behavior is code in `@aiviary/core`
+  that each bird opts into from its own package. See the "Every bird is an
+  independent agent" section of `docs/architecture.md`.
 - Everything runs from TypeScript source with Node's type stripping
   (Node 22.19 or newer). There is no build step: relative imports carry their
   `.ts` extension and only erasable TypeScript syntax is allowed.

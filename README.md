@@ -13,6 +13,27 @@ skills, so running it feels like running its own program, not pi.
 A third bird, `pigeon` (brain and knowledge management), lives in the brain
 repository and is built on `@aiviary/core` from here.
 
+## Every bird is its own agent
+
+Birds share code, never configuration. Each one is a separate installation
+with its own home directory (`~/.crow`, `~/.magpie`), and everything you can
+configure lives there: settings, model and theme, logins, sessions, MCP
+servers, personal instructions, installed packages, extensions, and skills.
+Configure one bird and no other bird, and not plain pi, is affected. The
+shared `@aiviary/core` library and the pi engine underneath are just code.
+
+- Change a bird's settings inside it (`/settings`, `/login`, `/mcp`) or in
+  `~/.<bird>/agent`.
+- Move a bird's home with `<BIRD>_HOME`, and set any pi environment setting
+  for one bird with `<BIRD>_<SETTING>` (`CROW_OFFLINE=1`). Plain `PI_*`
+  variables never reach a bird.
+- Provider keys exported in your shell (`ANTHROPIC_API_KEY`) are visible to
+  every program, birds included. Use `/login` in each bird to give them
+  separate accounts.
+
+See [`docs/architecture.md`](docs/architecture.md#every-bird-is-an-independent-agent)
+for the full list.
+
 ## Getting started
 
 Node.js 22.19 or newer and pnpm are the prerequisites.
@@ -26,9 +47,7 @@ pnpm birds list         # show which birds are linked
 pnpm check              # format check, lint, type-check, and test
 ```
 
-Each bird keeps its state in `~/.<bird>` (override with `CROW_HOME`,
-`MAGPIE_HOME`), separate from pi's `~/.pi`. On first run, use `/login` inside
-the bird to connect a model provider.
+On first run, use `/login` inside each bird to connect a model provider.
 
 Linked commands point at this checkout, so an edit takes effect on the next
 run. See [`docs/architecture.md`](docs/architecture.md) for how a bird is put

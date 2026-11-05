@@ -44,6 +44,8 @@ describe("buildBirdHelp", () => {
     expect(help).toContain("Wren: A small test bird.");
     expect(help).toContain("wren [options]");
     expect(help).toContain("WREN_HOME");
+    expect(help).toContain("WREN_<SETTING>");
+    expect(help).toContain("independent agent");
     expect(help).toContain("~/.wren");
     expect(help).toContain("Examples:");
   });

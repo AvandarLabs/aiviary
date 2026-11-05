@@ -67,13 +67,25 @@ export function resolveBirdHome(options: {
 }
 
 /**
+ * The prefix a bird's own environment variables carry: `CROW_`. A bird reads
+ * its home from `<PREFIX>HOME` and pi's settings from `<PREFIX><SETTING>`, so
+ * no variable meant for one bird (or for plain pi) reaches another.
+ *
+ * @param name The bird's command name.
+ * @returns The prefix.
+ */
+export function buildEnvPrefix(name: string): string {
+  return `${name.toUpperCase().replaceAll("-", "_")}_`;
+}
+
+/**
  * The environment variable that moves a bird's home: `CROW_HOME`.
  *
  * @param name The bird's command name.
  * @returns The variable's name.
  */
 export function buildHomeEnvVarName(name: string): string {
-  return `${name.toUpperCase().replaceAll("-", "_")}_HOME`;
+  return `${buildEnvPrefix(name)}HOME`;
 }
 
 /**
@@ -135,9 +147,22 @@ export function buildPiArgs(options: {
   return [...args, ...userArgs];
 }
 
+/** The prefix of every variable pi reads for its own configuration. */
+const PI_ENV_PREFIX = "PI_";
+
 /**
- * The environment pi runs in: the person's own, with pi pointed at the bird's
- * home and handed the brand.
+ * The environment pi runs in, which keeps every bird independent.
+ *
+ * - Every inherited `PI_*` variable is dropped: it was set for plain pi, or by
+ *   a parent pi session, and must not configure a bird. Left in,
+ *   `PI_CODING_AGENT_SESSION_DIR` alone would make every bird share one
+ *   session store.
+ * - The bird's own variables become pi's: `CROW_OFFLINE=1` reaches crow's pi
+ *   as `PI_OFFLINE=1`, and no other bird sees it.
+ * - The home is always the bird's (`PI_CODING_AGENT_DIR`), and the brand and
+ *   version are handed to the branding extension.
+ * - Everything else (`PATH`, provider keys such as `ANTHROPIC_API_KEY`) is
+ *   the person's shell environment and passes through unchanged.
  *
  * @param options The bird, its home, and the inherited environment.
  * @returns pi's environment.
@@ -148,11 +173,26 @@ export function buildPiEnv(options: {
   env: Readonly<Record<string, string | undefined>>;
 }): Record<string, string | undefined> {
   const { bird, birdHome, env } = options;
+  const birdPrefix = buildEnvPrefix(bird.brand.name);
+  const piEnv: Record<string, string | undefined> = {};
+  Object.entries(env).forEach(([key, value]) => {
+    if (!key.startsWith(PI_ENV_PREFIX)) {
+      piEnv[key] = value;
+    }
+  });
+  Object.entries(env).forEach(([key, value]) => {
+    if (
+      key.startsWith(birdPrefix) &&
+      key !== buildHomeEnvVarName(bird.brand.name)
+    ) {
+      piEnv[`${PI_ENV_PREFIX}${key.slice(birdPrefix.length)}`] = value;
+    }
+  });
   return {
-    ...env,
+    ...piEnv,
     PI_CODING_AGENT_DIR: join(birdHome, "agent"),
     // pi's update notice would tell people to update "pi", not the bird.
-    PI_SKIP_VERSION_CHECK: env["PI_SKIP_VERSION_CHECK"] ?? "1",
+    PI_SKIP_VERSION_CHECK: piEnv["PI_SKIP_VERSION_CHECK"] ?? "1",
     [BRAND_ENV_VAR_NAME]: brandToEnvValue(bird.brand),
     AIVIARY_BIRD_VERSION: bird.version,
   };

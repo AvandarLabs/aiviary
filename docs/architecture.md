@@ -4,6 +4,45 @@ aiviary builds **birds**: AI agent harnesses that each feel like their own
 program, built on the [pi coding agent](https://pi.dev) without forking it.
 This follows the same approach as Feynman, which wraps pi the same way.
 
+## Every bird is an independent agent
+
+Birds share code, never configuration. `@aiviary/core` and the pinned pi
+package are libraries every bird runs on; everything a person can configure
+belongs to exactly one bird. Installing, configuring, or breaking one bird
+never changes another, and none of them reads or writes plain pi's `~/.pi`.
+
+| Configuration                                        | Where it lives                                                    | How a person changes it                       |
+| ---------------------------------------------------- | ----------------------------------------------------------------- | --------------------------------------------- |
+| Settings (model, theme, keybindings, resource lists) | `~/.<bird>/agent/settings.json`, `keybindings.json`               | `/settings` inside the bird, or the files     |
+| Logins and API keys saved with `/login`              | `~/.<bird>/agent/auth.json`                                       | `/login` and `/logout` inside the bird        |
+| Sessions                                             | `~/.<bird>/agent/sessions/`                                       | `--continue`, `--resume`, `/new`              |
+| MCP servers                                          | `~/.<bird>/agent/mcp.json`                                        | The file, or `/mcp` inside the bird           |
+| Personal instructions                                | `~/.<bird>/agent/AGENTS.md`                                       | The file                                      |
+| Installed pi packages, extensions, skills, prompts   | `~/.<bird>/agent/` (`npm/`, `extensions/`, `skills/`, `prompts/`) | `<bird> install <source>`, or the directories |
+| Project trust decisions                              | `~/.<bird>/agent/trust.json`                                      | The trust prompt inside the bird              |
+| Environment settings                                 | `<BIRD>_*` variables, such as `CROW_OFFLINE=1`                    | The shell                                     |
+| Where all of the above lives                         | `<BIRD>_HOME` (default `~/.<bird>`)                               | The shell                                     |
+
+Three things a bird reads are not bird configuration, and the design keeps
+each one explicit:
+
+- **The shell environment.** Ordinary variables, including provider keys such
+  as `ANTHROPIC_API_KEY`, reach every program the shell starts, birds
+  included. To give birds different accounts, use `/login` in each bird
+  instead of an exported key. pi's own `PI_*` variables are the exception:
+  the launcher drops every inherited one (they were set for plain pi or a
+  parent session) and builds the bird's from its `<BIRD>_*` variables
+  (`buildPiEnv` in `packages/core/src/launch/launch.ts`).
+- **The project.** A repository's `AGENTS.md`, `.agents/skills`, and `.pi/`
+  belong to the project and are read by any agent working in it, once that
+  bird trusts the project.
+- **Machine-wide skills** in `~/.agents/skills`. Each bird's skill policy
+  decides whether it loads them (see below).
+
+A change to aiviary must keep this true: never add a file, directory, or
+variable that two birds read as configuration. Shared behavior goes in
+`@aiviary/core` as code, and each bird opts into it from its own package.
+
 ## How a bird runs
 
 ```
@@ -19,8 +58,9 @@ crow ──▶ birds/crow/src/main.ts ──▶ runBird (@aiviary/core)
                                --prompt-template birds/crow/prompts
                                <everything the person typed>
               env: PI_CODING_AGENT_DIR=~/.crow/agent
+                   PI_<SETTING> from CROW_<SETTING> (inherited PI_* dropped)
                    AIVIARY_BRAND=<the brand as JSON>
-                   PI_SKIP_VERSION_CHECK=1
+                   PI_SKIP_VERSION_CHECK=1 unless CROW_SKIP_VERSION_CHECK says otherwise
 ```
 
 pi is an ordinary dependency of `@aiviary/core` (pinned to an exact version)
@@ -32,13 +72,13 @@ pi's exit code.
 | Piece              | Where                              | How                                                                                                                                                                         |
 | ------------------ | ---------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Command name       | `birds/<bird>/package.json` `bin`  | `pnpm birds link <bird>` links it onto the PATH.                                                                                                                            |
-| Home               | `~/.<bird>/agent`                  | `PI_CODING_AGENT_DIR`. Settings, sessions, logins, and pi packages are never shared with `~/.pi` or another bird.                                                           |
+| Home               | `~/.<bird>/agent`                  | `PI_CODING_AGENT_DIR`. Every piece of configuration lives here and is never shared (see above).                                                                             |
 | Header             | `core/extensions/branding.ts`      | `ctx.ui.setHeader` draws the bird's picture beside its name in block letters (`src/header/header.ts` lays it out).                                                          |
 | Title and status   | `core/extensions/branding.ts`      | `setTitle` and `setWorkingMessage`. pi rewrites its own title after startup and on a session rename, so the extension sets the bird's again just after.                     |
 | Theme              | `core/src/piTheme/piTheme.ts`      | pi's dark theme with every identity color pointed at the bird's palette, written to `~/.<bird>/agent/themes/<bird>.json` on every launch and selected once on a fresh home. |
 | Instructions       | `birds/<bird>/SYSTEM.md`           | Appended to pi's system prompt, so pi's tool guidance stays.                                                                                                                |
 | Behavior           | `birds/<bird>/extensions/*.ts`     | pi extensions. Crow's `git-guard.ts` asks before every push, PR creation or merge, and hard reset.                                                                          |
-| Skills and prompts | `birds/<bird>/skills/`, `prompts/` | Loaded with `--skill` and `--prompt-template` when the directory exists.                                                                                                    |
+| Skills and prompts | `birds/<bird>/skills/`, `prompts/` | Loaded with `--skill` and `--prompt-template` when the directory exists. Which other skills it sees is its skill policy (below).                                            |
 
 The branding extension reads `AIVIARY_BRAND`. Without it (pi started any other
 way) it does nothing, so plain pi is never rebranded.
