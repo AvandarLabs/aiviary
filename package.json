@@ -1,0 +1,36 @@
+{
+  "name": "aiviary-monorepo",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "scripts": {
+    "lint": "oxlint .",
+    "lint:fix": "oxlint --fix .",
+    "format": "oxfmt --write .",
+    "format:check": "oxfmt --check .",
+    "type-check:scripts": "tsc -p scripts/tsconfig.json",
+    "test:scripts": "vitest run --config scripts/vitest.config.ts",
+    "skills": "tsx scripts/skills/SkillsCli.ts",
+    "skills:install": "tsx scripts/skills/SkillsCli.ts install",
+    "skills:update": "./scripts/skills/update-skills.sh",
+    "postinstall": "tsx scripts/skills/SkillsCli.ts install --quiet",
+    "check": "pnpm format:check && pnpm lint && pnpm build && pnpm type-check && pnpm type-check:scripts && pnpm test && pnpm test:scripts",
+    "dev": "pnpm --filter aiviary dev",
+    "build": "pnpm -r build",
+    "type-check": "pnpm -r type-check",
+    "test": "pnpm -r test"
+  },
+  "devDependencies": {
+    "@avandar/acclimate": "^0.4.0",
+    "@types/node": "^26.1.0",
+    "oxfmt": "^0.57.0",
+    "oxlint": "^1.72.0",
+    "tsx": "^4.23.12",
+    "typescript": "~6.0.3",
+    "vitest": "^4.1.11"
+  },
+  "packageManager": "pnpm@10.30.3"
+}

@@ -1,0 +1,5 @@
+# Every app and library is a package of its own. Deployable apps go under
+# apps/, and libraries and command-line tools under packages/.
+packages:
+  - "apps/*"
+  - "packages/*"
