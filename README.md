@@ -1,26 +1,38 @@
 # aiviary
 
-A command-line tool written in TypeScript for Node.js. Acclimate declares the
-command-line surface, `tsx` runs the source while you develop, and `tsc`
-compiles it to `dist/` for the installed command. oxlint, oxfmt, and vitest
-keep it clean.
+A family of branded AI agent harnesses ("birds") built on the
+[pi coding agent](https://pi.dev). Each bird is its own command with its own
+home directory, theme, ASCII-art header, system prompt, extensions, and
+skills, so running it feels like running its own program, not pi.
+
+| Bird   | Command  | Purpose                                                                                                                      |
+| ------ | -------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| Crow   | `crow`   | Avandar's agent for production-quality company code. Strict about scope, TDD, review, and never publishing without approval. |
+| Magpie | `magpie` | A personal agent for prototypes and experiments. Moves fast, skips team ceremony, still writes good code.                    |
+
+A third bird, `pigeon` (brain and knowledge management), lives in the brain
+repository and is built on `@aiviary/core` from here.
 
 ## Getting started
 
-Node.js 22 or newer and pnpm are the prerequisites.
+Node.js 22.19 or newer and pnpm are the prerequisites.
 
 ```sh
 pnpm install            # install dependencies, plus any missing agent skill
-pnpm dev --help         # run the CLI from source with tsx
-pnpm dev greet Ada      # run one command from source
-pnpm build              # compile src/ to dist/ with tsc
-pnpm start --help       # run the compiled CLI
-pnpm type-check         # run the TypeScript compiler without emitting
-pnpm test               # run the test suite with vitest
-pnpm lint               # lint with oxlint
-pnpm format             # format with oxfmt
-pnpm check              # format check, lint, build, type-check, and test: run before pushing
+pnpm crow               # run crow from this checkout
+pnpm magpie -c          # run magpie, continuing its last session here
+pnpm birds link crow    # put crow on your PATH (~/.local/bin by default)
+pnpm birds list         # show which birds are linked
+pnpm check              # format check, lint, type-check, and test
 ```
+
+Each bird keeps its state in `~/.<bird>` (override with `CROW_HOME`,
+`MAGPIE_HOME`), separate from pi's `~/.pi`. On first run, use `/login` inside
+the bird to connect a model provider.
+
+Linked commands point at this checkout, so an edit takes effect on the next
+run. See [`docs/architecture.md`](docs/architecture.md) for how a bird is put
+together and how to add one.
 
 ## Agent skills
 

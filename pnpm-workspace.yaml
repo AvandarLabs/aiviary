@@ -1,5 +1,6 @@
-# Every app and library is a package of its own. Deployable apps go under
-# apps/, and libraries and command-line tools under packages/.
+# Every package is its own workspace member. The shared library lives under
+# packages/, and each bird (a branded pi harness with its own command) under
+# birds/.
 packages:
-  - "apps/*"
   - "packages/*"
+  - "birds/*"

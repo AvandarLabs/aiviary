@@ -1,0 +1,21 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "target": "ES2023",
+    "lib": ["ES2023"],
+    "types": ["node"],
+
+    /* Node runs ESM: relative imports name their .ts file, which tsc
+       rewrites to .js when it emits. */
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "allowImportingTsExtensions": true,
+    "rewriteRelativeImportExtensions": true,
+
+    /* Only syntax Node's type stripping can erase: no enums, no namespaces,
+       no constructor parameter properties. */
+    "erasableSyntaxOnly": true,
+    "verbatimModuleSyntax": true
+  },
+  "include": ["src", "extensions"]
+}

@@ -1,0 +1,30 @@
+{
+  "name": "@aiviary/crow",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Avandar's problem-solving agent for production-quality code.",
+  "type": "module",
+  "bin": {
+    "crow": "src/main.ts"
+  },
+  "engines": {
+    "node": ">=22.19.0"
+  },
+  "scripts": {
+    "dev": "node src/main.ts",
+    "bird:link": "node ../../scripts/birds/birds.ts link crow",
+    "bird:unlink": "node ../../scripts/birds/birds.ts unlink crow",
+    "type-check": "tsc -p tsconfig.json",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@aiviary/core": "workspace:*"
+  },
+  "peerDependencies": {
+    "@earendil-works/pi-coding-agent": "*"
+  },
+  "devDependencies": {
+    "@earendil-works/pi-coding-agent": "1.5.0"
+  }
+}

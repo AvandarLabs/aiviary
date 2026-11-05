@@ -33,6 +33,19 @@ export const ROLE_FORMATS = {
   prompt: "magentaBright",
 } as const satisfies Record<ThemeRole, ThemeFormat>;
 
+/** The highlighted option in a menu: bold green. */
+export const SELECTION_FORMAT = ["bold", "greenBright"] as const;
+
+/**
+ * Styles the highlighted option of a menu.
+ *
+ * @param text The option's label.
+ * @returns The styled label.
+ */
+export function paintSelection(text: string): string {
+  return styleText([...SELECTION_FORMAT], text, { stream: process.stderr });
+}
+
 /**
  * Styles `text` as `role`.
  *

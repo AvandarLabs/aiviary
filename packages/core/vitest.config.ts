@@ -1,7 +1,7 @@
 import { defineConfig } from "vitest/config";
 
 /**
- * Test configuration for the CLI.
+ * Test configuration for `@aiviary/core`.
  *
  * The repository's own tooling under `scripts/` has its own run
  * (`pnpm test:scripts`), so this one covers `src/` only.

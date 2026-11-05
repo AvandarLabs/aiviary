@@ -1,0 +1,21 @@
+{
+  "name": "@aiviary/core",
+  "private": true,
+  "version": "0.1.0",
+  "description": "What every aiviary bird shares: the pi launcher, branding, theme, and setup tool.",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "engines": {
+    "node": ">=22.19.0"
+  },
+  "scripts": {
+    "type-check": "tsc -p tsconfig.json",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@earendil-works/pi-coding-agent": "1.5.0"
+  }
+}

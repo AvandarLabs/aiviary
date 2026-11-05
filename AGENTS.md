@@ -2,17 +2,23 @@
 
 ## Stack
 
-- This project is a Node.js command-line tool written in TypeScript (ESM). There
-  is no browser: the interface is the terminal.
-- The command-line surface is **Acclimate** (`@avandar/acclimate`). Each
-  command is its own Acclimate CLI, and `src/main.ts` composes them.
-- The source is written so Node could run it directly: relative imports carry
-  their `.ts` extension and only erasable TypeScript syntax is allowed.
-  `pnpm build` compiles `src/` to `dist/` with `tsc`, rewriting those
-  extensions, and the package's `bin` runs `dist/main.js`.
+- aiviary is a family of **birds**: branded AI agent harnesses built on the
+  [pi coding agent](https://pi.dev). Each bird is its own command (`crow`,
+  `magpie`) with its own home directory, theme, startup header, system prompt,
+  extensions, and skills. Nothing about a bird says "pi". Read
+  [`docs/architecture.md`](docs/architecture.md) before changing how birds
+  launch.
+- `packages/core` (`@aiviary/core`) is what every bird shares: the launcher,
+  the branding extension, the theme builder, and the `pnpm birds` setup tool.
+  It is also consumed outside this repository (brain's `pigeon`), so its
+  exported API in `src/index.ts` is a contract: change it deliberately.
+- `birds/<name>` is one bird. Everything that makes it different lives there:
+  `src/brand.ts`, `SYSTEM.md`, `extensions/`, and `skills/` / `prompts/`.
+- Everything runs from TypeScript source with Node's type stripping
+  (Node 22.19 or newer). There is no build step: relative imports carry their
+  `.ts` extension and only erasable TypeScript syntax is allowed.
 - Every action is reachable with flags alone. A value left out on a terminal is
-  asked for through `src/prompt/prompt.ts`, never demanded through a prompt an
-  agent cannot answer.
+  asked for, never demanded through a prompt an agent cannot answer.
 
 ## Documentation
 
@@ -79,19 +85,18 @@ When in doubt, write the test.
 
 ## Build, test, lint
 
-Node.js 22 or newer and pnpm are the prerequisites.
+Node.js 22.19 or newer and pnpm are the prerequisites.
 
 ```sh
 pnpm install            # install dependencies, plus any missing agent skill
-pnpm dev --help         # run the CLI from source with tsx
-pnpm dev greet Ada      # run one command from source
-pnpm build              # compile src/ to dist/ with tsc
-pnpm start --help       # run the compiled CLI
+pnpm crow               # run crow from this checkout (any pi option works)
+pnpm magpie --help      # run magpie from this checkout
+pnpm birds              # link, unlink, or list the birds on your PATH
 pnpm type-check         # run the TypeScript compiler without emitting
-pnpm test               # run the test suite with vitest
+pnpm test               # run every package's tests with vitest
 pnpm lint               # lint with oxlint
 pnpm format             # format with oxfmt
-pnpm check              # format check, lint, build, type-check, and test: run before pushing
+pnpm check              # format check, lint, type-check, and test: run before pushing
 ```
 
 ## General Code Style & Formatting
@@ -141,8 +146,9 @@ The rules for this project's language and frameworks live in `docs/rules/`:
   is scriptable, every value a person omits is asked for, every color is
   semantic.
 - [`docs/rules/cli-typescript.md`](docs/rules/cli-typescript.md): where those
-  rules live in this TypeScript code: Acclimate for arguments,
-  `src/prompt/prompt.ts` for questions, `src/theme/theme.ts` for color.
+  rules live in this TypeScript code: pass-through arguments for birds,
+  `node:util` `parseArgs` for the setup tool, and `packages/core` for prompts,
+  menus, and color.
 - [`docs/rules/monorepo.md`](docs/rules/monorepo.md): how this pnpm workspace is
   laid out. Tooling lives at the root, every app and library is its own
   package, and packages depend on each other through `workspace:*`.

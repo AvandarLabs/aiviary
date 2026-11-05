@@ -1,0 +1,24 @@
+{
+  "name": "@aiviary/magpie",
+  "private": true,
+  "version": "0.1.0",
+  "description": "A personal agent for prototypes, experiments, and shiny ideas.",
+  "type": "module",
+  "bin": {
+    "magpie": "src/main.ts"
+  },
+  "engines": {
+    "node": ">=22.19.0"
+  },
+  "scripts": {
+    "dev": "node src/main.ts",
+    "bird:link": "node ../../scripts/birds/birds.ts link magpie",
+    "bird:unlink": "node ../../scripts/birds/birds.ts unlink magpie",
+    "type-check": "tsc -p tsconfig.json",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@aiviary/core": "workspace:*"
+  }
+}

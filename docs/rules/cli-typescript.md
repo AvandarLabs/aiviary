@@ -3,74 +3,45 @@
 These rules say where [`cli-ux.md`](cli-ux.md) lives in this TypeScript code.
 Read that file first: it holds the rules, and this one holds the mechanics.
 
-## Arguments are Acclimate
+## Arguments
 
-The command-line surface is declared with
-[Acclimate](https://www.npmjs.com/package/@avandar/acclimate)
-(`@avandar/acclimate`). Each command is its own Acclimate CLI in its own
-module (`src/greet/greet.ts` exports `GreetCli`), and `src/main.ts` only
-composes them with `addCommand` and calls `Acclimate.run`.
+aiviary has two kinds of command, and neither uses Acclimate, the default
+for TypeScript CLIs elsewhere:
 
-```ts
-export const GreetCli = Acclimate.createCLI("greet")
-  .description("Print a greeting.")
-  .addPositionalArg({ name: "name", type: "string", required: false })
-  .addOption({
-    name: "--shout",
-    type: "boolean",
-    required: false,
-    defaultValue: false,
-    description: "Uppercase the greeting.",
-  })
-  .action(async ({ name, shout }) => {
-    await runAction(async () => {
-      // ...
-    });
-  });
-```
+- **A bird** (`crow`, `magpie`) passes its arguments to pi untouched, so a
+  person can use every pi option. `runBird` in `packages/core/src/runBird`
+  intercepts only its own: `-h`/`--help` (the bird's help, which wins over
+  everything before `--`), `-v`/`--version`, and `--pi-help`.
+- **The setup tool** (`pnpm birds`) parses with `node:util` `parseArgs`.
+  Acclimate 0.4 does not show help for a subcommand (`link -h` is read as a
+  missing argument) and refuses an optional argument followed by an option
+  with a value, and this tool has to support both.
 
-Know Acclimate's edges:
-
-- An option's name is camel-cased in the action: `--dry-run` arrives as
-  `dryRun`.
-- Acclimate ignores an option nobody declared rather than refusing it. Declare
-  every option a command reads, including global ones (`addGlobalOption`),
-  which every subcommand inherits.
-- There is no hook that runs before every command. Work that must happen first
-  goes in `src/main.ts`, before `Acclimate.run`.
-- Keep the logic out of the action. The action resolves its inputs and calls
-  pure functions that are tested on their own (`buildGreeting`).
+Revisit Acclimate when it handles those. Until then, a new command follows
+the setup tool's shape: a pure `parse...Args` that returns a request or an
+error, a `build...Help` that is the one source of the help text, and a
+`run...` that returns the exit code.
 
 ## Output
 
 - Data goes to stdout with `process.stdout.write`. It is the only thing that
   does.
-- Everything else (progress, warnings, failures) goes to stderr through `say`
-  in `src/theme/theme.ts`. Do not use `Acclimate.log` or `console.log` for it:
-  both write to stdout.
-- Color goes through `paint(role, text)` in `src/theme/theme.ts`, which owns
-  the palette. It uses Node's `styleText`, which leaves the text plain when
-  stderr is not a terminal or `NO_COLOR` is set.
+- Everything else goes to stderr through `Output` in
+  `packages/core/src/output/output.ts`: `progress` before work starts,
+  `success` (✅), `warning` (⚠️), and `error`, which prints `❌ command:
+message` and an indented `⚠️` line saying how to fix it.
+- Color goes through `paint(role, text)` in
+  `packages/core/src/theme/theme.ts`, which owns the palette. It uses Node's
+  `styleText`, which leaves the text plain when stderr is not a terminal or
+  `NO_COLOR` is set.
 
-## Asking for a missing value: `src/prompt/prompt.ts`
+## Asking for a missing value
 
-Describe the missing value as a `Question` (what it is, what to ask, the flag
-that answers it) and call `askIfMissing`. It asks on stderr only when stdin is
-a terminal; otherwise it throws a message naming the flag.
-
-```ts
-const name = await askIfMissing({
-  given: nameFromArgs,
-  question: {
-    subject: "name to greet",
-    label: "Who should I greet?",
-    flag: "the <name> argument",
-  },
-});
-```
-
-## Errors and exit codes
-
-Wrap every action's body in `runAction` (`src/runAction.ts`). A thrown error
-becomes one `error:` line on stderr and `process.exitCode = 1`, instead of an
-unhandled rejection's stack trace.
+- A choice from a fixed set is a menu: `selectOption` in
+  `packages/core/src/select/select.ts`. It supports the arrows and `j`/`k`
+  (wrapping), `g`/`G`, Enter, and Escape, `q`, or Ctrl-C to cancel, and draws
+  the current option bold green behind a `❯` cursor.
+- Free text is `askIfMissing` in `packages/core/src/prompt/prompt.ts`.
+- Ask only when stdin and stderr are both terminals. Otherwise print the
+  usage to stderr and fail with the exact command that would have answered
+  the question.

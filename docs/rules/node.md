@@ -10,11 +10,9 @@ Node.js.
 - Import Node's built-ins with the `node:` prefix: `node:fs/promises`, not
   `fs/promises`.
 - Relative imports name the `.ts` file they import:
-  `import { buildGreeting } from "./greet/greet.ts"`. `tsc` rewrites the
-  extension to `.js` when it builds (`rewriteRelativeImportExtensions`), and
-  `tsc --noEmit` rejects an import without one.
-- No path aliases (`@/...`). `tsc` does not rewrite them, so the built `dist/`
-  would import a path that does not exist.
+  `import { renderHeader } from "./header/header.ts"`. Node runs these files
+  directly, and `tsc --noEmit` rejects an import without an extension.
+- No path aliases (`@/...`). Node does not resolve them.
 - Type-only imports and exports use `import type` / `export type`. The
   compiler enforces it (`verbatimModuleSyntax`).
 
@@ -31,7 +29,8 @@ under `tsx`, `tsc`, and Node's own type stripping. The compiler enforces it
 
 ## The process
 
-- Only `src/main.ts` touches the process as a whole. Set `process.exitCode`
+- Only a package's entry point (`src/main.ts`, `scripts/birds/birds.ts`)
+  touches the process as a whole. Set `process.exitCode`
   rather than calling `process.exit()`, which can cut off output that has not
   been flushed yet.
 - Read environment variables in one module, validate them with Zod there, and
@@ -45,7 +44,7 @@ under `tsx`, `tsc`, and Node's own type stripping. The compiler enforces it
 - When rethrowing, wrap and keep the original:
   `throw new Error("reading the config", { cause: error })`.
 - Catch only where you can add context or recover. A command's top-level
-  failure is reported once, by `src/runAction.ts`.
+  failure is reported once, where it returns its exit code.
 
 ## I/O
 
@@ -55,10 +54,14 @@ under `tsx`, `tsc`, and Node's own type stripping. The compiler enforces it
 - Use `stream.pipeline` from `node:stream/promises` to connect streams, so
   errors and backpressure propagate.
 
-## Building and dependencies
+## Running and dependencies
 
-- `pnpm build` compiles `src/` to `dist/` with `tsc -p tsconfig.build.json`.
-  The package's `bin` and `files` point at `dist/`, never at `src/`.
-- Prefer what Node ships (`styleText` from `node:util`, `fetch`,
+- There is no build step. Every package runs from its TypeScript source with
+  Node's type stripping, and each bird's `bin` points at `src/main.ts`. This
+  works because workspace packages resolve through symlinks to their real
+  paths, which are outside `node_modules`. Shipping a bird some other way
+  (Homebrew, npm) will need a bundling step first: see
+  [`docs/architecture.md`](../architecture.md).
+- Prefer what Node ships (`styleText` from `node:util`, `parseArgs`, `fetch`,
   `node:readline/promises`) over a dependency. Add a package only when it saves
   real work, and say why in the change that adds it.
