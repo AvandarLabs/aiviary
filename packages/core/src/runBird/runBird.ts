@@ -125,7 +125,11 @@ async function _launch(
   Output.progress(
     `Starting ${bird.brand.displayName} in ${_tildify(birdHome)}`,
   );
-  const { isNewHome } = await prepareBirdHome({ brand: bird.brand, birdHome });
+  const { isNewHome } = await prepareBirdHome({
+    brand: bird.brand,
+    birdHome,
+    skillPolicy: bird.skillPolicy,
+  });
   if (isNewHome) {
     Output.success(
       `Created ${_tildify(birdHome)}. Run /login inside ${bird.brand.name} to connect a model provider.`,

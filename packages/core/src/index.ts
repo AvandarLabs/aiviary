@@ -9,6 +9,7 @@
 export type { BirdBrand, BirdPalette } from "./brand/brand.ts";
 export { findBrandProblems } from "./brand/brand.ts";
 export type { BirdDefinition } from "./launch/launch.ts";
+export type { BirdSkillPolicy } from "./home/home.ts";
 export { resolveBirdHome } from "./launch/launch.ts";
 export { buildPiTheme } from "./piTheme/piTheme.ts";
 export { renderHeader } from "./header/header.ts";

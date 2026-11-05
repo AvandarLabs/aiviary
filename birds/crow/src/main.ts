@@ -19,6 +19,8 @@ const { version } = JSON.parse(
 ) as { version: string };
 
 process.exitCode = await runBird(
-  { brand: CROW_BRAND, packageDir, version },
+  // Crow works on Avandar code, so it loads its own skills and the project's,
+  // never the personal skills installed machine-wide.
+  { brand: CROW_BRAND, packageDir, version, skillPolicy: "own-and-project" },
   process.argv.slice(2),
 );

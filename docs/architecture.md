@@ -50,10 +50,22 @@ prompt ("This allows pi to load..."), the "No models available" hint and its
 documentation paths, and `--pi-help`. Changing them would need a fork or a
 patch of pi, which this design avoids on purpose.
 
-Skill discovery is pi's default: the bird's own `skills/` plus
-`~/.agents/skills` and the project's `.agents/skills`. Giving a bird a curated
-set only (`--no-skills` plus its own `--skill` paths) is a per-bird decision
-still to make.
+### Which skills a bird sees
+
+A bird always loads its own skills: its package's `skills/` and its home's
+`agent/skills`. Its `skillPolicy` (in `BirdDefinition`) decides the rest.
+
+| Policy                 | Also loads                                                             | Birds                                                                                     |
+| ---------------------- | ---------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| `everything` (default) | The machine-wide `~/.agents/skills` and the project's `.agents/skills` | magpie                                                                                    |
+| `own-and-project`      | Only the project's `.agents/skills`, once the project is trusted       | crow, and brain's pigeon (brain renders its skills into the workspace's `.agents/skills`) |
+
+`own-and-project` works through pi's own resource filter: the launcher adds
+one exclusion, `!<home>/.agents/skills/**`, to the bird's `skills` setting on
+every run, and removes it again if the policy changes. The absolute pattern
+matches only the machine-wide directory, so the bird's own skills and project
+skills are untouched, and every other entry in that setting stays the
+person's.
 
 ## Packages
 

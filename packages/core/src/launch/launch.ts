@@ -5,6 +5,7 @@ import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { BRAND_ENV_VAR_NAME, brandToEnvValue } from "../brand/brand.ts";
 import type { BirdBrand } from "../brand/brand.ts";
+import type { BirdSkillPolicy } from "../home/home.ts";
 
 /** The pi package every bird runs on. */
 export const PI_PACKAGE_NAME = "@earendil-works/pi-coding-agent";
@@ -23,6 +24,8 @@ export type BirdDefinition = {
   packageDir: string;
   /** The bird's version, shown in its header and by `--version`. */
   version: string;
+  /** Which skills the bird loads besides its own. Defaults to `everything`. */
+  skillPolicy?: BirdSkillPolicy;
 };
 
 /** The resources a bird ships, found on disk. */
