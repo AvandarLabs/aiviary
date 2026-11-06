@@ -2,7 +2,7 @@
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { runBird } from "@aiviary/core";
+import { runBird } from "@avandar/aiviary-core";
 import { CROW_BRAND } from "./brand.ts";
 
 /**
@@ -11,7 +11,7 @@ import { CROW_BRAND } from "./brand.ts";
  * Everything that makes Crow different from other birds lives in
  * this package: `src/brand.ts` (how it looks), `SYSTEM.md` (how it works),
  * `extensions/` (what it enforces), and `skills/` and `prompts/` when it has
- * any. The launcher in `@aiviary/core` hands them to pi.
+ * any. The launcher in `@avandar/aiviary-core` hands them to pi.
  */
 const packageDir = join(dirname(fileURLToPath(import.meta.url)), "..");
 const { version } = JSON.parse(

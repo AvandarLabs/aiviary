@@ -1,7 +1,7 @@
 import { defineConfig } from "vitest/config";
 
 /**
- * Test configuration for `@aiviary/core`.
+ * Test configuration for `@avandar/aiviary-core`.
  *
  * The repository's own tooling under `scripts/` has its own run
  * (`pnpm test:scripts`), so this one covers `src/` only.

@@ -8,10 +8,10 @@
   extensions, and skills. Nothing about a bird says "pi". Read
   [`docs/architecture.md`](docs/architecture.md) before changing how birds
   launch.
-- `packages/core` (`@aiviary/core`) is what every bird shares: the launcher,
-  the branding extension, the theme builder, and the `pnpm birds` setup tool.
-  It is also consumed outside this repository (brain's `pigeon`), so its
-  exported API in `src/index.ts` is a contract: change it deliberately.
+- `packages/core` (`@avandar/aiviary-core`) is what every bird shares: the
+  launcher, the branding extension, the theme builder, and the `pnpm birds`
+  setup tool. It is also consumed outside this repository (brain's `pigeon`),
+  so its exported API in `src/index.ts` is a contract: change it deliberately.
 - `birds/<name>` is one bird. Everything that makes it different lives there:
   `src/brand.ts`, `SYSTEM.md`, `extensions/`, and `skills/` / `prompts/`.
 - **Every bird is an independent agent.** Birds may share packages and
@@ -19,9 +19,15 @@
   MCP servers, instructions, packages, and skills live only in its own home
   (`~/.<bird>`), and its environment settings only in `<BIRD>_*` variables.
   Never add a file, directory, or variable that two birds (or a bird and
-  plain pi) read as configuration. Shared behavior is code in `@aiviary/core`
-  that each bird opts into from its own package. See the "Every bird is an
-  independent agent" section of `docs/architecture.md`.
+  plain pi) read as configuration. Shared behavior is code in
+  `@avandar/aiviary-core` that each bird opts into from its own package. See
+  the "Every bird is an independent agent" section of `docs/architecture.md`.
+- Everything this repository publishes goes under the `@avandar` npm scope.
+  Shared packages are `@avandar/aiviary-<name>`; birds in `birds/` are
+  `@avandar/<bird>` with a `<bird>` command. The root package, `aiviary`, is
+  private and never published. A bird built elsewhere on aiviary (brain's
+  `pigeon`) belongs to its own repository and is named there. See "Names" in
+  `docs/architecture.md`.
 - Everything runs from TypeScript source with Node's type stripping
   (Node 22.19 or newer). There is no build step: relative imports carry their
   `.ts` extension and only erasable TypeScript syntax is allowed.

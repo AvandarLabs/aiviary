@@ -6,7 +6,7 @@ This follows the same approach as Feynman, which wraps pi the same way.
 
 ## Every bird is an independent agent
 
-Birds share code, never configuration. `@aiviary/core` and the pinned pi
+Birds share code, never configuration. `@avandar/aiviary-core` and the pinned pi
 package are libraries every bird runs on; everything a person can configure
 belongs to exactly one bird. Installing, configuring, or breaking one bird
 never changes another, and none of them reads or writes plain pi's `~/.pi`.
@@ -41,12 +41,13 @@ each one explicit:
 
 A change to aiviary must keep this true: never add a file, directory, or
 variable that two birds read as configuration. Shared behavior goes in
-`@aiviary/core` as code, and each bird opts into it from its own package.
+`@avandar/aiviary-core` as code, and each bird opts into it from its own
+package.
 
 ## How a bird runs
 
 ```
-crow ──▶ birds/crow/src/main.ts ──▶ runBird (@aiviary/core)
+crow ──▶ birds/crow/src/main.ts ──▶ runBird (@avandar/aiviary-core)
                                        │ 1. resolve the home: $CROW_HOME or ~/.crow
                                        │ 2. prepare it: write the theme, select it once
                                        │ 3. find the bird's resources
@@ -63,9 +64,9 @@ crow ──▶ birds/crow/src/main.ts ──▶ runBird (@aiviary/core)
                    PI_SKIP_VERSION_CHECK=1 unless CROW_SKIP_VERSION_CHECK says otherwise
 ```
 
-pi is an ordinary dependency of `@aiviary/core` (pinned to an exact version)
-and runs as a child process attached to the terminal. The bird exits with
-pi's exit code.
+pi is an ordinary dependency of `@avandar/aiviary-core` (pinned to an exact
+version) and runs as a child process attached to the terminal. The bird exits
+with pi's exit code.
 
 ### What makes a bird its own program
 
@@ -109,11 +110,30 @@ person's.
 
 ## Packages
 
-| Package                           | Role                                                                                                                                                                                                                                                   |
-| --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `packages/core` (`@aiviary/core`) | The launcher (`src/launch`, `src/runBird`), the bird's home (`src/home`), branding (`src/brand`, `src/header`, `extensions/branding.ts`), the theme (`src/piTheme`), and the setup tool (`src/setup`, `src/select`). `src/index.ts` is its public API. |
-| `birds/crow`, `birds/magpie`      | One bird each: `src/brand.ts`, `src/main.ts`, `SYSTEM.md`, and optional `extensions/`, `skills/`, `prompts/`.                                                                                                                                          |
-| `scripts/birds/birds.ts`          | `pnpm birds`: finds every bird under `birds/` by its `bin` and runs the setup tool for them.                                                                                                                                                           |
+| Package                                   | Role                                                                                                                                                                                                                                                   |
+| ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `packages/core` (`@avandar/aiviary-core`) | The launcher (`src/launch`, `src/runBird`), the bird's home (`src/home`), branding (`src/brand`, `src/header`, `extensions/branding.ts`), the theme (`src/piTheme`), and the setup tool (`src/setup`, `src/select`). `src/index.ts` is its public API. |
+| `birds/crow`, `birds/magpie`              | One bird each: `src/brand.ts`, `src/main.ts`, `SYSTEM.md`, and optional `extensions/`, `skills/`, `prompts/`.                                                                                                                                          |
+| `scripts/birds/birds.ts`                  | `pnpm birds`: finds every bird under `birds/` by its `bin` and runs the setup tool for them.                                                                                                                                                           |
+
+### Names
+
+Everything this repository publishes goes under the `@avandar` npm scope,
+which belongs to the `avandar` npm org. The scope says who publishes a package,
+not who it is for: crow's focus on Avandar's processes belongs in its
+description, not its name. A bird built elsewhere on `@avandar/aiviary-core`
+is not an Avandar product and does not use the scope: brain's `pigeon` is
+named by brain.
+
+| What                            | Name                                                            | Example                             |
+| ------------------------------- | --------------------------------------------------------------- | ----------------------------------- |
+| A shared package in `packages/` | `@avandar/aiviary-<name>`                                       | `@avandar/aiviary-core`             |
+| A bird in `birds/`              | `@avandar/<bird>`, with a `<bird>` command                      | `@avandar/crow`, `crow`             |
+| A bird's Homebrew formula       | `<bird>` in the `AvandarLabs/homebrew-tap` tap (not set up yet) | `brew install avandarlabs/tap/crow` |
+| The root workspace              | `aiviary`, private and never published                          |                                     |
+
+Homebrew's own collection already has a `crow` formula (a C++ web framework),
+so always install a bird by its full tap name.
 
 ## Running from source
 
@@ -125,15 +145,15 @@ workspace dependency resolves through its symlink to a real path outside
 effect on the next run.
 
 The same holds for a consumer outside this repository that links
-`@aiviary/core` by path, which is how brain's `pigeon` uses it today. Before a
-bird ships through Homebrew or npm, where its dependencies sit inside
+`@avandar/aiviary-core` by path, which is how brain's `pigeon` uses it today.
+Before a bird ships through Homebrew or npm, where its dependencies sit inside
 `node_modules`, it needs a bundling step (for example, one `tsdown` bundle per
-bird) that turns its source and `@aiviary/core` into JavaScript.
+bird) that turns its source and `@avandar/aiviary-core` into JavaScript.
 
 ## Adding a bird
 
 1. Copy `birds/magpie` to `birds/<name>` and rename the package
-   (`@aiviary/<name>`), its `bin`, and its `bird:link` / `bird:unlink`
+   (`@avandar/<name>`), its `bin`, and its `bird:link` / `bird:unlink`
    scripts.
 2. Write `src/brand.ts`: the name, tagline, picture, block-letter banner (the
    current birds use figlet's "ANSI Shadow" font), palette, and working

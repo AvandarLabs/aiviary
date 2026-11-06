@@ -1,5 +1,5 @@
 {
-  "name": "@aiviary/core",
+  "name": "@avandar/aiviary-core",
   "private": true,
   "version": "0.1.0",
   "description": "What every aiviary bird shares: the pi launcher, branding, theme, and setup tool.",

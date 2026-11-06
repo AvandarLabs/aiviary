@@ -11,7 +11,7 @@ skills, so running it feels like running its own program, not pi.
 | Magpie | `magpie` | A personal agent for prototypes and experiments. Moves fast, skips team ceremony, still writes good code.                    |
 
 A third bird, `pigeon` (brain and knowledge management), lives in the brain
-repository and is built on `@aiviary/core` from here.
+repository and is built on `@avandar/aiviary-core` from here.
 
 ## Every bird is its own agent
 
@@ -20,7 +20,8 @@ with its own home directory (`~/.crow`, `~/.magpie`), and everything you can
 configure lives there: settings, model and theme, logins, sessions, MCP
 servers, personal instructions, installed packages, extensions, and skills.
 Configure one bird and no other bird, and not plain pi, is affected. The
-shared `@aiviary/core` library and the pi engine underneath are just code.
+shared `@avandar/aiviary-core` library and the pi engine underneath are just
+code.
 
 - Change a bird's settings inside it (`/settings`, `/login`, `/mcp`) or in
   `~/.<bird>/agent`.

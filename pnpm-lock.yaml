@@ -8,12 +8,12 @@ importers:
 
   .:
     devDependencies:
-      '@aiviary/core':
-        specifier: workspace:*
-        version: link:packages/core
       '@avandar/acclimate':
         specifier: ^0.4.0
         version: 0.4.0
+      '@avandar/aiviary-core':
+        specifier: workspace:*
+        version: link:packages/core
       '@types/node':
         specifier: ^26.1.0
         version: 26.6.6
@@ -35,7 +35,7 @@ importers:
 
   birds/crow:
     dependencies:
-      '@aiviary/core':
+      '@avandar/aiviary-core':
         specifier: workspace:*
         version: link:../../packages/core
     devDependencies:
@@ -45,7 +45,7 @@ importers:
 
   birds/magpie:
     dependencies:
-      '@aiviary/core':
+      '@avandar/aiviary-core':
         specifier: workspace:*
         version: link:../../packages/core
 

@@ -1,4 +1,4 @@
-import type { BirdBrand } from "@aiviary/core";
+import type { BirdBrand } from "@avandar/aiviary-core";
 
 /** How Magpie looks: its picture, its name, and its colors. */
 export const MAGPIE_BRAND: BirdBrand = {

@@ -2,8 +2,8 @@
 import { readdirSync, readFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { runBirdSetup } from "@aiviary/core";
-import type { SetupBird } from "@aiviary/core";
+import { runBirdSetup } from "@avandar/aiviary-core";
+import type { SetupBird } from "@avandar/aiviary-core";
 
 /**
  * `pnpm birds`: link this checkout's birds onto your PATH, unlink them, or

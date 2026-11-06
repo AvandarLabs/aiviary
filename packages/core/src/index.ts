@@ -1,5 +1,5 @@
 /**
- * `@aiviary/core`: what every bird shares.
+ * `@avandar/aiviary-core`: what every bird shares.
  *
  * A bird is a branded harness around the pi coding agent: its own command,
  * home directory, theme, header, system prompt, extensions, and skills. A

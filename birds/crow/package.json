@@ -1,5 +1,5 @@
 {
-  "name": "@aiviary/crow",
+  "name": "@avandar/crow",
   "private": true,
   "version": "0.1.0",
   "description": "Avandar's problem-solving agent for production-quality code.",
@@ -19,7 +19,7 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@aiviary/core": "workspace:*"
+    "@avandar/aiviary-core": "workspace:*"
   },
   "peerDependencies": {
     "@earendil-works/pi-coding-agent": "*"

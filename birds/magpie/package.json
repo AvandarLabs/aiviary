@@ -1,5 +1,5 @@
 {
-  "name": "@aiviary/magpie",
+  "name": "@avandar/magpie",
   "private": true,
   "version": "0.1.0",
   "description": "A personal agent for prototypes, experiments, and shiny ideas.",
@@ -19,6 +19,6 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@aiviary/core": "workspace:*"
+    "@avandar/aiviary-core": "workspace:*"
   }
 }
