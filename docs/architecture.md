@@ -70,16 +70,16 @@ with pi's exit code.
 
 ### What makes a bird its own program
 
-| Piece              | Where                              | How                                                                                                                                                                         |
-| ------------------ | ---------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Command name       | `birds/<bird>/package.json` `bin`  | `pnpm birds link <bird>` links it onto the PATH.                                                                                                                            |
-| Home               | `~/.<bird>/agent`                  | `PI_CODING_AGENT_DIR`. Every piece of configuration lives here and is never shared (see above).                                                                             |
-| Header             | `core/extensions/branding.ts`      | `ctx.ui.setHeader` draws the bird's picture beside its name in block letters (`src/header/header.ts` lays it out).                                                          |
-| Title and status   | `core/extensions/branding.ts`      | `setTitle` and `setWorkingMessage`. pi rewrites its own title after startup and on a session rename, so the extension sets the bird's again just after.                     |
-| Theme              | `core/src/piTheme/piTheme.ts`      | pi's dark theme with every identity color pointed at the bird's palette, written to `~/.<bird>/agent/themes/<bird>.json` on every launch and selected once on a fresh home. |
-| Instructions       | `birds/<bird>/SYSTEM.md`           | Appended to pi's system prompt, so pi's tool guidance stays.                                                                                                                |
-| Behavior           | `birds/<bird>/extensions/*.ts`     | pi extensions. Crow's `git-guard.ts` asks before every push, PR creation or merge, and hard reset.                                                                          |
-| Skills and prompts | `birds/<bird>/skills/`, `prompts/` | Loaded with `--skill` and `--prompt-template` when the directory exists. Which other skills it sees is its skill policy (below).                                            |
+| Piece              | Where                              | How                                                                                                                                                                                                                                                                              |
+| ------------------ | ---------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Command name       | `birds/<bird>/package.json` `bin`  | `pnpm birds link <bird>` links it onto the PATH.                                                                                                                                                                                                                                 |
+| Home               | `~/.<bird>/agent`                  | `PI_CODING_AGENT_DIR`. Every piece of configuration lives here and is never shared (see above).                                                                                                                                                                                  |
+| Header             | `core/extensions/branding.ts`      | `ctx.ui.setHeader` draws the bird's picture beside its name in block letters (`src/header/header.ts` lays it out). The picture is drawn in the accent, and the cells its optional `artHighlight` mask marks are drawn in the theme's text color, so a picture can use two tones. |
+| Title and status   | `core/extensions/branding.ts`      | `setTitle` and `setWorkingMessage`. pi rewrites its own title after startup and on a session rename, so the extension sets the bird's again just after.                                                                                                                          |
+| Theme              | `core/src/piTheme/piTheme.ts`      | pi's dark theme with every identity color pointed at the bird's palette, written to `~/.<bird>/agent/themes/<bird>.json` on every launch and selected once on a fresh home.                                                                                                      |
+| Instructions       | `birds/<bird>/SYSTEM.md`           | Appended to pi's system prompt, so pi's tool guidance stays.                                                                                                                                                                                                                     |
+| Behavior           | `birds/<bird>/extensions/*.ts`     | pi extensions. Crow's `git-guard.ts` asks before every push, PR creation or merge, and hard reset.                                                                                                                                                                               |
+| Skills and prompts | `birds/<bird>/skills/`, `prompts/` | Loaded with `--skill` and `--prompt-template` when the directory exists. Which other skills it sees is its skill policy (below).                                                                                                                                                 |
 
 The branding extension reads `AIVIARY_BRAND`. Without it (pi started any other
 way) it does nothing, so plain pi is never rebranded.
@@ -157,7 +157,12 @@ bird) that turns its source and `@avandar/aiviary-core` into JavaScript.
    scripts.
 2. Write `src/brand.ts`: the name, tagline, picture, block-letter banner (the
    current birds use figlet's "ANSI Shadow" font), palette, and working
-   message. `src/brand.test.ts` checks it.
+   message. `src/brand.test.ts` checks it. The current pictures are drawn
+   with quadrant block characters (`▘▝▖▗▀▄▌▐▚▞▛▜▙▟█`), which give each
+   terminal cell a 2x2 grid of pixels, plus an `artHighlight` mask for the
+   lighter tone (a magpie's white plumage, the glint in each eye). The header
+   drops the picture on a terminal too narrow for it and the banner together,
+   so a wider picture needs a wider terminal.
 3. Write `SYSTEM.md`, and add `extensions/`, `skills/`, or `prompts/` as the
    bird needs them.
 4. Add a `pnpm <name>` script at the root, run `pnpm install`, then

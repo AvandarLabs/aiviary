@@ -1,7 +1,13 @@
 import type { BirdBrand } from "../brand/brand.ts";
 
 /** What a piece of the header is, which decides its color. */
-export type HeaderRole = "art" | "banner" | "title" | "tagline" | "detail";
+export type HeaderRole =
+  | "art"
+  | "artHighlight"
+  | "banner"
+  | "title"
+  | "tagline"
+  | "detail";
 
 /** A run of header text in one role. */
 export type HeaderSegment = { text: string; role: HeaderRole };
@@ -61,7 +67,7 @@ function _renderLogo(
   const artWidth = _widthOf(brand.art);
   const bannerWidth = _widthOf(brand.banner);
   if (artWidth + ART_GAP.length + bannerWidth <= contentWidth) {
-    return _sideBySide(brand.art, brand.banner, artWidth);
+    return _sideBySide(brand, artWidth);
   }
   if (bannerWidth <= contentWidth) {
     return brand.banner.map((line) => {
@@ -73,21 +79,39 @@ function _renderLogo(
 
 /** The picture and the banner beside each other, centered vertically. */
 function _sideBySide(
-  art: readonly string[],
-  banner: readonly string[],
+  brand: Readonly<BirdBrand>,
   artWidth: number,
 ): HeaderSegment[][] {
+  const { art, banner } = brand;
   const height = Math.max(art.length, banner.length);
   const artTop = Math.floor((height - art.length) / 2);
   const bannerTop = Math.floor((height - banner.length) / 2);
   return Array.from({ length: height }, (_, row) => {
     const artLine = art[row - artTop] ?? "";
+    const maskLine = brand.artHighlight?.[row - artTop] ?? "";
     const bannerLine = banner[row - bannerTop] ?? "";
     return [
-      { text: artLine.padEnd(artWidth) + ART_GAP, role: "art" as const },
+      ..._artSegments(artLine.padEnd(artWidth) + ART_GAP, maskLine),
       { text: bannerLine, role: "banner" as const },
     ];
   });
+}
+
+/** One line of the picture, split into runs of accent and highlight. */
+function _artSegments(artLine: string, maskLine: string): HeaderSegment[] {
+  const mask = [...maskLine];
+  const segments: HeaderSegment[] = [];
+  [...artLine].forEach((character, index) => {
+    const isHighlight = (mask[index] ?? " ") !== " ";
+    const role: HeaderRole = isHighlight ? "artHighlight" : "art";
+    const last = segments[segments.length - 1];
+    if (last?.role === role) {
+      last.text += character;
+    } else {
+      segments.push({ text: character, role });
+    }
+  });
+  return segments;
 }
 
 /** Indents a line and cuts it at the terminal's width. */

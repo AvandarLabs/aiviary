@@ -10,6 +10,7 @@ import type { HeaderRole } from "../src/header/header.ts";
 /** The pi theme color each part of the header is drawn in. */
 const ROLE_COLORS = {
   art: "accent",
+  artHighlight: "text",
   banner: "accent",
   title: "accent",
   tagline: "text",

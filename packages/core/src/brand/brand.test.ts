@@ -30,6 +30,16 @@ describe("findBrandProblems", () => {
     });
     expect(problems).toHaveLength(3);
   });
+
+  it("accepts a highlight mask inside the picture", () => {
+    expect(findBrandProblems({ ...BRAND, artHighlight: [" o"] })).toEqual([]);
+  });
+
+  it("reports a highlight mask that reaches past the picture", () => {
+    expect(
+      findBrandProblems({ ...BRAND, artHighlight: ["    o", "o"] }),
+    ).toEqual(["artHighlight reaches past the picture"]);
+  });
 });
 
 describe("brandFromEnvValue", () => {

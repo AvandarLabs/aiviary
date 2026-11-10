@@ -21,6 +21,13 @@ export type BirdBrand = {
   tagline: string;
   /** A picture of the bird, one string per line. */
   art: string[];
+  /**
+   * Which cells of the picture are drawn in the highlight color instead of
+   * the accent: a mask laid over `art`, where any character other than a
+   * space marks the cell under it. It lets a picture use two tones, such as
+   * a magpie's white belly or the glint in a crow's eye.
+   */
+  artHighlight?: string[];
   /** The bird's name in block letters, one string per line. */
   banner: string[];
   /** The bird's colors. */
@@ -59,7 +66,18 @@ export function findBrandProblems(brand: Readonly<BirdBrand>): string[] {
   if (brand.banner.length === 0) {
     problems.push("banner has no lines");
   }
+  if (!_isHighlightInsideArt(brand)) {
+    problems.push("artHighlight reaches past the picture");
+  }
   return problems;
+}
+
+/** Whether every cell the highlight mask marks lies on the picture. */
+function _isHighlightInsideArt(brand: Readonly<BirdBrand>): boolean {
+  return (brand.artHighlight ?? []).every((maskLine, row) => {
+    const artLength = [...(brand.art[row] ?? "")].length;
+    return [...maskLine.trimEnd()].length <= artLength;
+  });
 }
 
 /**

@@ -40,6 +40,24 @@ describe("renderHeader", () => {
     expect(_roles(lines)).toContain("art");
   });
 
+  it("draws the cells the highlight mask marks in the highlight role", () => {
+    const lines = renderHeader({
+      brand: { ...BRAND, artHighlight: [" o", "", "^"] },
+      width: 40,
+      details: "v1",
+    });
+    expect(lines[1]!.slice(1)).toEqual([
+      { text: "(", role: "art" },
+      { text: "o", role: "artHighlight" },
+      { text: ">   ", role: "art" },
+      { text: "WWW", role: "banner" },
+    ]);
+    expect(lines[3]!.slice(1, 3)).toEqual([
+      { text: "^", role: "artHighlight" },
+      { text: "^    ", role: "art" },
+    ]);
+  });
+
   it("drops the picture when only the banner fits", () => {
     const lines = renderHeader({ brand: BRAND, width: 6, details: "v1" });
     expect(_roles(lines)).not.toContain("art");
